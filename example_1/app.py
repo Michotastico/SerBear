@@ -1,7 +1,12 @@
-from api import API, View, Configurations
+import logging
+
+from api import API, View, Configurations, Middleware
 from utilities.responses import simple_response, json_response, html_response
 from utilities.urls import url, url_group, include_url_group
 from utilities.wsgi_http_server import StandaloneApplication
+
+
+logger = logging.getLogger("example_1_logger")
 
 
 def exception_handler(error):
@@ -103,10 +108,30 @@ route_group = url_group(
 app.add_route_group(route_group)
 
 
+class SimpleCustomMiddleware(Middleware):
+    def process_request(self, request):
+        logger.error("Processing request {}".format(request.url))
+
+    def process_response(self, request, response):
+        logger.error("Processing response {}".format(request.url))
+
+
+class SimpleCustomMiddlewareTwo(Middleware):
+    def process_request(self, request):
+        logger.error("Processing request 2 {}".format(request.url))
+
+    def process_response(self, request, response):
+        logger.error("Processing response 2 {}".format(request.url))
+
+
+app.add_middleware(SimpleCustomMiddleware)
+app.add_middleware(SimpleCustomMiddlewareTwo)
+
+
 if __name__ == '__main__':
     options = {
         'bind': '127.0.0.1:8000',
         'timeout': 600,
-        'workers': 2
+        'workers': 1
     }
     StandaloneApplication(app, options).run()

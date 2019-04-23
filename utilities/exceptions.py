@@ -8,3 +8,7 @@ class MalformedUrl(Exception):
 
 class UnimplementedMethod(Exception):
     pass
+
+
+class BadMiddleware(Exception):
+    pass

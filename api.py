@@ -9,7 +9,9 @@ from webob import Request
 from whitenoise import WhiteNoise
 
 from utilities.constants import Constants
-from utilities.exceptions import PathAlreadyExists, UnimplementedMethod
+from utilities.exceptions import (
+    PathAlreadyExists, UnimplementedMethod, BadMiddleware
+)
 from utilities.responses import simple_response
 from utilities.urls import check_url
 
@@ -19,15 +21,24 @@ api_log = logging.getLogger("web_sync_framework")
 class API(object):
     def __init__(self, configs=None):
         self.routes = dict()
+        self.middleware_handlers = list()
         self.configs = configs
         if not isinstance(self.configs, Configurations):
             self.configs = Configurations()
 
-        self.static_content_provider = self._process_call
+        self.static_content_provider = self._handle_call
         if self.configs.serve_static:
             self.static_content_provider = WhiteNoise(
-                self._process_call, self.configs.static_path
+                self._handle_call, self.configs.static_path
             )
+
+    def add_middleware(self, middleware):
+        if (
+                not issubclass(middleware, Middleware) or
+                not inspect.isclass(middleware)
+        ):
+            raise BadMiddleware()
+        self.middleware_handlers.append(middleware(self))
 
     def render_template(self, filename, context=None):
         rendering_context = context
@@ -87,12 +98,23 @@ class API(object):
 
         return self._missing_request_404()
 
-    def _process_call(self, environ, start_response):
+    def _handle_call(self, environ, start_response, middleware_handlers=None):
         request = Request(environ)
+
+        handlers = middleware_handlers
+        if handlers is None:
+            handlers = list()
+
+        for handler in handlers:
+            handler.process_request(request)
+
         try:
             response = self._handle_request(request)
         except Exception as error:
             response = self._error_request_500(error)
+
+        for handler in reversed(handlers):
+            handler.process_response(request, response)
 
         return response(environ, start_response)
 
@@ -103,7 +125,9 @@ class API(object):
             environ["PATH_INFO"] = path_info[len("/static"):]
             return self.static_content_provider(environ, start_response)
 
-        return self._process_call(environ, start_response)
+        return self._handle_call(
+            environ, start_response, self.middleware_handlers
+        )
 
 
 class View(object):
@@ -119,6 +143,17 @@ class View(object):
 
     def render_template(self, filename, context=None):
         return self.app.render_template(filename, context)
+
+
+class Middleware(object):
+    def __init__(self, app):
+        self.app = app
+
+    def process_request(self, request):
+        pass
+
+    def process_response(self, request, response):
+        pass
 
 
 class Configurations(object):

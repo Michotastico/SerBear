@@ -6,6 +6,7 @@ import traceback
 from jinja2 import Environment, FileSystemLoader
 from parse import parse
 from webob import Request
+from whitenoise import WhiteNoise
 
 from utilities.constants import Constants
 from utilities.exceptions import PathAlreadyExists, UnimplementedMethod
@@ -21,6 +22,12 @@ class API(object):
         self.configs = configs
         if not isinstance(self.configs, Configurations):
             self.configs = Configurations()
+
+        self.static_content_provider = self._process_call
+        if self.configs.serve_static:
+            self.static_content_provider = WhiteNoise(
+                self._process_call, self.configs.static_path
+            )
 
     def render_template(self, filename, context=None):
         rendering_context = context
@@ -80,7 +87,7 @@ class API(object):
 
         return self._missing_request_404()
 
-    def __call__(self, environ, start_response):
+    def _process_call(self, environ, start_response):
         request = Request(environ)
         try:
             response = self._handle_request(request)
@@ -88,6 +95,15 @@ class API(object):
             response = self._error_request_500(error)
 
         return response(environ, start_response)
+
+    def __call__(self, environ, start_response):
+        path_info = environ.get("PATH_INFO", "")
+
+        if path_info.startswith("/static"):
+            environ["PATH_INFO"] = path_info[len("/static"):]
+            return self.static_content_provider(environ, start_response)
+
+        return self._process_call(environ, start_response)
 
 
 class View(object):
@@ -111,6 +127,8 @@ class Configurations(object):
             error_404=Constants.BASE_ERROR_404,
             error_500=Constants.BASE_ERROR_500,
             templates_path=Constants.TEMPLATES_PATH,
+            static_path=Constants.STATIC_PATH,
+            serve_static=True,
             exception_handler=None
     ):
         self.debug = debug
@@ -119,6 +137,8 @@ class Configurations(object):
         self.templates_env = Environment(
             loader=FileSystemLoader(os.path.abspath(templates_path))
         )
+        self.static_path = static_path
+        self.serve_static = serve_static
         self.exception_handler = exception_handler
 
     def get_template(self, template):

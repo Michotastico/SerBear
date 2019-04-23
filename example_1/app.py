@@ -12,6 +12,7 @@ def exception_handler(error):
 app_configs = Configurations(
     debug=True,
     templates_path='example_1/templates',
+    static_path='example_1/static'
     # exception_handler=exception_handler
 )
 app = API(configs=app_configs)

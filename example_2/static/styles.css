@@ -1,0 +1,23 @@
+.center-horizontal {
+  display: flex;
+  justify-content: center;
+}
+
+.center-vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.bear-image {
+    width: 50%;
+    border: 3px solid #e5a47a;
+    border-radius: 15px;
+}
+
+.title {
+    margin: 10px;
+}
+
+.title-zone {
+    margin-bottom: 10px;
+}

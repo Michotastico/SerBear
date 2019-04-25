@@ -32,6 +32,10 @@ class API(object):
                 self._handle_call, self.configs.static_path
             )
 
+    def add_multiple_middleware(self, middleware_list):
+        for middleware in middleware_list:
+            self.add_middleware(middleware)
+
     def add_middleware(self, middleware):
         if (
                 not issubclass(middleware, Middleware) or

@@ -18,7 +18,7 @@ from utilities.urls import check_url
 api_log = logging.getLogger(Constants.LOGGER_NAME)
 
 
-class API(object):
+class Serbear(object):
     def __init__(self, configs=None):
         self.routes = dict()
         self.middleware_handlers = list()

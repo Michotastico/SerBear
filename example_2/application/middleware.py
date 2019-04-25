@@ -1,6 +1,6 @@
 import logging
 
-from api import Middleware
+from serbear import Middleware
 
 logger = logging.getLogger("middleware")
 

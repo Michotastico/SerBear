@@ -1,4 +1,4 @@
-from api import Configurations
+from serbear import Configurations
 from example_2.application.middleware import ExampleMiddleware
 from utilities.constants import Constants
 

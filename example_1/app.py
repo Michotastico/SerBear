@@ -1,6 +1,6 @@
 import logging
 
-from api import API, View, Configurations, Middleware
+from serbear import Serbear, View, Configurations, Middleware
 from utilities.responses import simple_response, json_response, html_response
 from utilities.urls import url, url_group, include_url_group
 from utilities.wsgi_http_server import StandaloneApplication
@@ -20,7 +20,7 @@ app_configs = Configurations(
     static_path='example_1/static'
     # exception_handler=exception_handler
 )
-app = API(configs=app_configs)
+app = Serbear(configs=app_configs)
 
 
 @app.route('/home')

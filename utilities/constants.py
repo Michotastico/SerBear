@@ -3,3 +3,4 @@ class Constants(object):
     BASE_ERROR_500 = "Server Error"
     TEMPLATES_PATH = "templates"
     STATIC_PATH = "static"
+    LOGGER_NAME = "serbear"

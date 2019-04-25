@@ -15,7 +15,7 @@ from utilities.exceptions import (
 from utilities.responses import simple_response
 from utilities.urls import check_url
 
-api_log = logging.getLogger("web_sync_framework")
+api_log = logging.getLogger(Constants.LOGGER_NAME)
 
 
 class API(object):

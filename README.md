@@ -1,8 +1,8 @@
 # Ser-Bear
 
-Ser-bear is a Python synchronous web server framework built to learn how frameworks like Flask works, and how it can grow to become something like Django.
+Ser-bear is a Python synchronous web server framework built to learn how frameworks like Flask work, and how it can grow to become something like Django.
 
-It use WSGI to work, in the `requirements.pip` it came with `Gunicorn` to be able to run.
+It uses WSGI to work (the `requirements.pip` comes with `Gunicorn` to be able to run).
 
 ## How to use it
 
@@ -30,12 +30,12 @@ def template(request):
     return html_response(rendered_template)
 ```
 
-To start the server, you always can run from the terminal 
+To start the server, you can always run it from the terminal 
 ```
 gunicorn server:app
 ```
 
-But, if you wish, you can use the gunicorn in the programmatic way included
+But, if you wish, you can use gunicorn in the programmatic way included
 
 ```python
 from server import app
@@ -64,7 +64,7 @@ python main.py
 
 ### TO-DO
  * Add missing things and build the pypi package.
- * Improve this readme adding content like `example_2` that is a Django-like project structure.
+ * Improve this readme adding content like `example_2`, a Django-like project structure.
  * Add method type handling in the `@app.route` decorator.
  * Add testing.
  * Add documentation.
